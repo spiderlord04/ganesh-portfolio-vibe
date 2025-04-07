@@ -1,6 +1,7 @@
 
 import { useEffect, useRef } from 'react';
-import { Mail, Phone, Linkedin, GitHub } from 'lucide-react';
+import { Mail, Phone, Linkedin, Github } from 'lucide-react';
+
 
 interface ContactInfo {
   icon: React.ReactNode;
