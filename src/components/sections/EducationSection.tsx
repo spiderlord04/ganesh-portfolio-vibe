@@ -1,5 +1,4 @@
-
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { School } from 'lucide-react';
 
 interface Education {
@@ -11,6 +10,7 @@ interface Education {
 
 const EducationSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   
   const education: Education[] = [
     {
@@ -34,15 +34,21 @@ const EducationSection = () => {
   ];
   
   useEffect(() => {
+    // Ensure visibility even if animation fails
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 1000);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-slide-in');
+          setIsVisible(true);
           observer.unobserve(entry.target);
         }
       },
       {
         threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
       }
     );
 
@@ -51,6 +57,7 @@ const EducationSection = () => {
     }
 
     return () => {
+      clearTimeout(timer);
       if (sectionRef.current) {
         observer.unobserve(sectionRef.current);
       }
@@ -58,7 +65,11 @@ const EducationSection = () => {
   }, []);
 
   return (
-    <section id="education" className="mb-20 opacity-0" ref={sectionRef}>
+    <section 
+      id="education" 
+      className={`mb-20 transition-opacity duration-500 ${isVisible ? 'opacity-100 animate-slide-in' : 'opacity-0'}`} 
+      ref={sectionRef}
+    >
       <h2 className="section-title">Education</h2>
       
       <div className="mt-8 overflow-x-auto no-scrollbar">

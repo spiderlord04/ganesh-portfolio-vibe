@@ -1,5 +1,4 @@
-
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Mail, Phone, Linkedin, Github } from 'lucide-react';
 
 
@@ -12,6 +11,7 @@ interface ContactInfo {
 
 const ContactSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   
   const contactInfo: ContactInfo[] = [
     {
@@ -33,7 +33,7 @@ const ContactSection = () => {
       link: '#',
     },
     {
-      icon: <GitHub className="h-6 w-6" />,
+      icon: <Github className="h-6 w-6" />,
       label: 'GitHub',
       value: 'View GitHub Profile',
       link: '#',
@@ -41,15 +41,21 @@ const ContactSection = () => {
   ];
   
   useEffect(() => {
+    // Ensure visibility even if animation fails
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 1000);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-slide-in');
+          setIsVisible(true);
           observer.unobserve(entry.target);
         }
       },
       {
         threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
       }
     );
 
@@ -58,6 +64,7 @@ const ContactSection = () => {
     }
 
     return () => {
+      clearTimeout(timer);
       if (sectionRef.current) {
         observer.unobserve(sectionRef.current);
       }
@@ -65,7 +72,11 @@ const ContactSection = () => {
   }, []);
 
   return (
-    <section id="contact" className="mb-20 opacity-0" ref={sectionRef}>
+    <section 
+      id="contact" 
+      className={`mb-20 transition-opacity duration-500 ${isVisible ? 'opacity-100 animate-slide-in' : 'opacity-0'}`} 
+      ref={sectionRef}
+    >
       <h2 className="section-title">Contact Me</h2>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         {contactInfo.map((info, index) => (

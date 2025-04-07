@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { Database, Code2, FileJson, PaintBucket } from 'lucide-react';
 
@@ -10,7 +9,7 @@ interface Skill {
 
 const SkillsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   
   const skills: Skill[] = [
     {
@@ -36,16 +35,21 @@ const SkillsSection = () => {
   ];
   
   useEffect(() => {
+    // Ensure visibility even if animation fails
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 1000);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true);
-          entry.target.classList.add('animate-slide-in');
+          setIsVisible(true);
           observer.unobserve(entry.target);
         }
       },
       {
         threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
       }
     );
 
@@ -54,6 +58,7 @@ const SkillsSection = () => {
     }
 
     return () => {
+      clearTimeout(timer);
       if (sectionRef.current) {
         observer.unobserve(sectionRef.current);
       }
@@ -61,7 +66,11 @@ const SkillsSection = () => {
   }, []);
 
   return (
-    <section id="skills" className="mb-20 opacity-0" ref={sectionRef}>
+    <section 
+      id="skills" 
+      className={`mb-20 transition-opacity duration-500 ${isVisible ? 'opacity-100 animate-slide-in' : 'opacity-0'}`} 
+      ref={sectionRef}
+    >
       <h2 className="section-title">Skills</h2>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         {skills.map((skill, index) => (
@@ -77,7 +86,7 @@ const SkillsSection = () => {
               <div 
                 className="skill-progress" 
                 style={{ 
-                  width: visible ? `${skill.percentage}%` : '0%',
+                  width: isVisible ? `${skill.percentage}%` : '0%',
                   transitionDelay: `${index * 0.2}s`
                 }}
               ></div>
